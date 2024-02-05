@@ -92,10 +92,13 @@ public class Main {
         t1.start();
         t2.start();
 
+        */
 
 
         // Second scenario
         // get message without blocking
+
+        /*
 
         data = new LinkedList<>();
         Thread t3 = new Thread(new Runnable() {
@@ -118,9 +121,14 @@ public class Main {
 
         t3.start();
 
+        */
+
 
 
         // Third scenario
+
+        /*
+
 
         Runnable consumerRun = new Runnable() {
             @Override
@@ -158,6 +166,7 @@ public class Main {
 
         */
 
+        // get stats
 
         /*
 
@@ -183,15 +192,16 @@ public class Main {
         System.out.println(stat.getTotalMessageLength());
         System.out.println(stat.getTotalProgramMemoryUsage());
 
+        */
 
-        // Plus Score
-        // Save data to file
-        saveDataToFile(path, data);
+
 
 
 
 
         //Fourth scenario
+
+        /*
 
         Runnable producerRun =  new Runnable() {
             Random random = new Random();
@@ -215,8 +225,13 @@ public class Main {
         }
 
 
+         */
+
 
         //Fifth scenario
+
+        /*
+
 
         Queue q = new Queue(data, 2, 5);
 
@@ -239,6 +254,8 @@ public class Main {
          */
 
 
+        // Save data to file
+        /*saveDataToFile(path, data);*/
 
     }
 }
