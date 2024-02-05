@@ -15,7 +15,6 @@ public class Queue  {
     private final Semaphore reader = new Semaphore(1);
     private final Semaphore readWrite = new Semaphore(0);
     private int maxLimit = 0;
-    private int maxMessagesLength = 0;
     private AtomicInteger queueLength = new AtomicInteger(0);
 
 
@@ -42,7 +41,6 @@ public class Queue  {
         this.maxLimit = maxLimit;
         this.queueLength.set(queue.size());
         this.beforeUsedMem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-        this.maxMessagesLength = maxMessagesLength;
     }
 
 
@@ -50,27 +48,20 @@ public class Queue  {
     public String get_msg() throws InterruptedException, ExecutionException {
         SimpleFuture<String> future = new SimpleFuture<>();
         new Thread(() -> {
-            /*
-            while (queue.isEmpty()) {
-                System.out.println("Waiting for data...");
-            }
-
-             */
-
             String item = null;
             try {
-                if(queue.isEmpty()){
+                reader.acquire();
+                if(queueLength.get() == 0){
                     System.out.println("Waiting for data...");
                 }
-                readWrite.acquire(); // added to wait for msg to come in queue
-                reader.acquire(1);
+                readWrite.acquire(); // wait for msg to come in queue
                 item = queue.remove();
                 queueLength.decrementAndGet();
                 future.setResult(item);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                reader.release(1);
+                reader.release();
             }
         }).start();
         return future.get();
@@ -80,8 +71,23 @@ public class Queue  {
 
 
     public Optional<String> get_msg_nb() throws ExecutionException, InterruptedException {
+        reader.acquire();
         if(queueLength.get() > 0) { // value exists in queue --- could have problems
-            return Optional.ofNullable(get_msg());
+            SimpleFuture<String> future = new SimpleFuture<>();
+            new Thread(() -> {
+                String item = null;
+                try {
+                    readWrite.acquire();
+                    item = queue.remove();
+                    queueLength.decrementAndGet();
+                    future.setResult(item);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    reader.release();
+                }
+            }).start();
+            return Optional.of(future.get());
         } else { // value not exists in queue
             return Optional.empty();
         }
@@ -93,10 +99,6 @@ public class Queue  {
 
             try {
                 writer.acquire();
-                if (item.length() >= maxMessagesLength){
-                    System.out.println("Word length limit exceeded");
-                    future.setResult(false);
-                }
                 if (getMaxLimit() != 0){
                 /*
                 while(queue.size() == maxLimit) { // find a better way to deal with this

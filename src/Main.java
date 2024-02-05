@@ -50,21 +50,20 @@ public class Main {
 
 
 
-        /*
-        // Plus Score
+
         // Load data saved to file
+        /*
         String path = "src/resource/queue_file.txt";
         data = loadDataFromFile(path);
         */
 
 
         // declare new queue;
-//        Queue q = new Queue(data);
+        Queue q = new Queue(data);
 
 
-
-        /*
         // First scenario
+        /*
         data = new LinkedList<>();
         Thread t1 = new Thread(new Runnable() {
             @Override
@@ -158,6 +157,7 @@ public class Main {
         }
 
         */
+
 
         /*
 
